@@ -1,4 +1,3 @@
-#%%
 import argparse, os, warnings, copy
 import camelot
 import pandas as pd
@@ -9,9 +8,13 @@ from collections.abc import MutableMapping
 LATTICE_SPECIFIC = ('line_scale', 'shift_text', 'copy_text', )
 STREAM_SPECIFIC = ('edge_tol', 'row_tol', )
 ACC_THRESH = 70
-PARSE_CONFIG = {}
+MONGO_DEFAULT_HOST = 'localhost'
+MONGO_DEFAULT_PORT = 27017
 
-#%%
+############### User Editable ###############
+PARSE_CONFIG = {}
+#############################################
+
 def pop_specific(obj, keys):
     obj = copy.deepcopy(obj)
     for key in keys:
@@ -126,18 +129,17 @@ def pipeline(filename, db, flavor='auto', extras={}, verbose=True):
     if verbose:
         print('\nRETRIEVING FROM MONGODB...')
         retr_tables = tables_from_mongo(pdfname, db)
-        print(f'{len(retr_tables)} TABLES RETRIEVED FROM MONGODB')
-# %%
+        print(f'{len(retr_tables)} TABLES RETRIEVED FROM MONGODB\n')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file', type=str, required=True, help='Path to PDF')
-    parser.add_argument('-d', '--db', type=str, required=True, help='Database name')
-    parser.add_argument('--host', type=str, default='localhost', help='MongoDB host')
-    parser.add_argument('--port', type=int, default=27017, help='MongoDB port')
+    parser.add_argument('-d', '--db', type=str, required=True, help='MongoDB database name')
+    parser.add_argument('--host', type=str, default=MONGO_DEFAULT_HOST, help='MongoDB host')
+    parser.add_argument('--port', type=int, default=MONGO_DEFAULT_PORT, help='MongoDB port')
     parser.add_argument('--verbose', type=bool, default=True, help='Verbosity')
     parser.add_argument('--method', type=str, default='auto', help='Parsing method from {"auto", "lattice" or "stream"}')
-    parser.add_argument('--conf', type=str, default=[], nargs='*', action='append', help='Specify settings for the parser as `key` `value`')
+    parser.add_argument('--conf', type=str, default=[], nargs='*', action='append', help='Settings for the parser as `key` `value`')
     args = parser.parse_args()
     conf = process_args(args.conf)
     
@@ -151,5 +153,3 @@ if __name__ == '__main__':
     db = client[args.db]
 
     pipeline(args.file, db, flavor=args.method, extras=extras, verbose=args.verbose)
-
-
