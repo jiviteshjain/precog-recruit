@@ -1,13 +1,17 @@
+#%%
 import argparse, os, warnings, copy
 import camelot
 import pandas as pd
+from tabulate import tabulate
 from pymongo import MongoClient
 from collections.abc import MutableMapping
 
 LATTICE_SPECIFIC = ('line_scale', 'shift_text', 'copy_text', )
 STREAM_SPECIFIC = ('edge_tol', 'row_tol', )
 ACC_THRESH = 70
+PARSE_CONFIG = {}
 
+#%%
 def pop_specific(obj, keys):
     obj = copy.deepcopy(obj)
     for key in keys:
@@ -15,6 +19,16 @@ def pop_specific(obj, keys):
             obj.pop(key)
     return obj
 
+def process_args(args):
+    res = {}
+    for arg in args:
+        try:
+            res[arg[0]] = int(arg[1])
+        except IndexError:
+            pass
+        except (TypeError, ValueError):
+            res[arg[0]] = arg[1]
+    return res
 
 def stringify_keys(obj):
     if not isinstance(obj, MutableMapping):
@@ -38,7 +52,7 @@ def parse_keys(obj):
     return temp
 
 
-def pdf_to_table(filename, flavor='auto', extras=None):
+def pdf_to_table(filename, flavor='auto', extras={}):
     if flavor not in ('auto', 'lattice', 'stream'):
         raise ValueError('"flavor" must be one of "auto", "lattice" or "stream".')
     
@@ -61,24 +75,12 @@ def pdf_to_table(filename, flavor='auto', extras=None):
     return tables
 
 def print_tables(tables, filename):
-    print(f'{len(tables)} TABLES PARSED FROM {filename}\n')
-    
-    pd.set_option('display.max_rows', 50)
-    pd.set_option('display.max_columns', 10)
-    pd.set_option('display.width', 150)
-    pd.set_option('display.max_colwidth', -1)
+    print(f'{len(tables)} TABLE(S) PARSED FROM {filename}\n')
 
     for i, table in enumerate(tables):
         df = table if isinstance(table, pd.DataFrame) else table.df
         print(f'Table {i}: {df.shape[0]} rows, {df.shape[1]} cols')
-        print(df)
-        print('---')
-
-    pd.reset_option('display.max_rows')
-    pd.reset_option('display.max_columns')
-    pd.reset_option('display.width')
-    pd.reset_option('display.max_colwidth')
-
+        print(tabulate(df, headers='keys', tablefmt='fancy_grid'))
 
 def tables_to_mongo(tables, filename, db):
     collection = db[filename]
@@ -95,13 +97,59 @@ def tables_from_mongo(filename, db, idx=-1):
         tables = collection.find({}, {'_id': False, 'name': False})
         res = []
         for table in tables:
-            res.append(pd.DataFrame.from_dict(parse_keys(table)))
+            res.append(pd.DataFrame.from_dict(parse_keys(table['data'])))
         return res
     
     else:
         table = collection.find_one({'name': f'table_{idx}'}, {'_id': False, 'name': False})
-        table = pd.DataFrame.from_dict(parse_keys(table))
+        if table is None:
+            return []
+        table = pd.DataFrame.from_dict(parse_keys(table['data']))
         return [table, ]
 
-def pipeline():
-    pass
+def pipeline(filename, db, flavor='auto', extras={}, verbose=True):
+    pdfname = os.path.splitext(os.path.basename(filename))[0]
+
+    if verbose:
+        print('PARSING FILES...')
+    tables = pdf_to_table(filename, flavor=flavor, extras=extras)
+    print_tables(tables, pdfname)
+
+    if verbose:
+        print(f'\nSTORING INTO MONGODB {db.name}.{pdfname} ...')
+    ids = tables_to_mongo(tables, pdfname, db)
+    if verbose:
+        print('MONGODB OBJECT ID(S):')
+        for i in ids:
+            print(i)
+
+    if verbose:
+        print('\nRETRIEVING FROM MONGODB...')
+        retr_tables = tables_from_mongo(pdfname, db)
+        print(f'{len(retr_tables)} TABLES RETRIEVED FROM MONGODB')
+# %%
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file', type=str, required=True, help='Path to PDF')
+    parser.add_argument('-d', '--db', type=str, required=True, help='Database name')
+    parser.add_argument('--host', type=str, default='localhost', help='MongoDB host')
+    parser.add_argument('--port', type=int, default=27017, help='MongoDB port')
+    parser.add_argument('--verbose', type=bool, default=True, help='Verbosity')
+    parser.add_argument('--method', type=str, default='auto', help='Parsing method from {"auto", "lattice" or "stream"}')
+    parser.add_argument('--conf', type=str, default=[], nargs='*', action='append', help='Specify settings for the parser as `key` `value`')
+    args = parser.parse_args()
+    conf = process_args(args.conf)
+    
+    if conf:
+        warnings.warn('Parsing config options that require non-primitive data to be passed aren\'t supported from the command line. Add them to the `PARSE_CONFIG` dictionary at the top of this file.')
+
+    extras = PARSE_CONFIG.copy()
+    extras.update(conf)
+    
+    client = MongoClient(args.host, args.port)
+    db = client[args.db]
+
+    pipeline(args.file, db, flavor=args.method, extras=extras, verbose=args.verbose)
+
+
