@@ -12,6 +12,7 @@ import nltk.collocations
 import nltk.corpus
 import wordcloud
 import random
+import seaborn as sns
 
 MONGO_DATABASE_NAME = 'jivitesh-task-3b'
 PATH_OUT = '../../out/task-3b/'
@@ -139,8 +140,10 @@ plt.show()
 wc.to_file(os.path.join(PATH_OUT, 'plots/word-cloud.png'))
 
 
+
 ###############  Scatter plot of proportion  ###############
 ############### of upvotes given vs received ###############
+
 users_top = db.users.find().sort(
     'Reputation', pymongo.DESCENDING).skip(100000).limit(10000)
 
@@ -198,3 +201,44 @@ fig = plt.gcf()
 plt.show()
 fig.patch.set_facecolor('white')
 fig.savefig(os.path.join(PATH_OUT, 'plots/vote-ratio.png'), dpi=200)
+
+
+############### Distribution of scores of  ###############
+############### accepted and other answers ###############
+
+questions = {}
+for post in db.posts.find({'PostTypeId': '1'}):
+    try:
+        post_id = post['Id'],
+        answer_id = post['AcceptedAnswerId']
+    except KeyError:
+        continue
+    questions[post_id] = answer_id
+
+answers = []
+for post in db.posts.find({'PostTypeId': '2'}):
+    try:
+        temp = {
+            'Id': post['Id'],
+            'Score': post['Score'],
+            'ParentId': post['ParentId']
+        }
+    except KeyError:
+        continue
+    answers.append(temp)
+
+for a in answers:
+    p = a['ParentId']
+    a['Accepted'] = p in questions and questions[p] == a['Id']
+
+df = pd.DataFrame.from_records(answers)
+df['Score'] = df['Score'].astype(int)
+filtered_df = df[np.abs(df.Score - df.Score.mean()) <= 3 * df.Score.std()]
+ax = sns.kdeplot(data=filtered_df, x='Score', hue='Accepted',
+                 fill=True, hue_order=(True, False))
+ax.set_xlim((-5, 15))
+ax.set_title('Answer Score Distribution')
+fig = plt.gcf()
+fig.patch.set_facecolor('white')
+fig.savefig(os.path.join(PATH_OUT, 'plots/score-densities.png'), dpi=200)
+plt.show()

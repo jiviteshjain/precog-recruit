@@ -8,6 +8,8 @@ import matplotlib as mpl
 import pandas as pd
 import pickle
 import pymongo
+from scipy.stats import zscore
+import seaborn as sns
 # import nltk
 # import nltk.collocations
 # import nltk.corpus
@@ -307,4 +309,90 @@ filtered_df.info()
 filtered_df = df[df.TotalReceived > 20]
 filtered_df.info()
 
+# %%
+#########################################
+
+questions = []
+
+for post in db.posts.find({'PostTypeId': '1'}):
+    try:
+        temp = {
+            'Id': post['Id'],
+            'AcceptedAnswerId': post['AcceptedAnswerId']
+        }
+    except KeyError:
+        continue
+    questions.append(temp)
+# %%
+len(questions)
+# %%
+answers = []
+for post in db.posts.find({'PostTypeId': '2'}):
+    try:
+        temp = {
+            'Id': post['Id'],
+            'Score': post['Score'],
+            'ParentId': post['ParentId']
+        }
+    except KeyError:
+        continue
+    answers.append(temp)
+len(answers)
+# %%
+ques_dict = {}
+for q in questions:
+    ques_dict[q['Id']] = q['AcceptedAnswerId']
+# %%
+for a in answers:
+    p = a['ParentId']
+    a['Accepted'] = p in ques_dict and ques_dict[p] == a['Id']
+# %%
+df = pd.DataFrame.from_records(answers)
+display(df)
+# %%
+ax = filtered_df.groupby('Accepted').Score.plot(kind='kde')
+plt.legend()
+plt.show()
+# %%
+df.info()
+# %%
+df['Score'] = df['Score'].astype(int)
+# %%
+df.describe()
+# %%
+z_sc = np.abs(zscore(df))
+# %%
+
+df.Score.mean()
+# %%
+filtered_df = df[np.abs(df.Score - df.Score.mean()) <= 3 * df.Score.std()]
+# %%
+ax = df.groupby('Accepted').Score.plot.kde(bw_method=0.1)
+# ax.set_xlim((-50, 50))
+plt.legend()
+fig = plt.gcf()
+ax = plt.gca()
+ax.set_xlim((-40, 100))
+plt.show()
+
+# %%
+df.count()
+# %%
+df['Accepted' == True].count()
+# %%
+# df[df.Accepted == False].Accepted = 'No'
+display(df)
+# %%
+filtered_df = filtered_df.sample(frac=1).reset_index(drop=True)
+display(filtered_df)
+# %%
+ax = sns.kdeplot(data=filtered_df, x='Score', hue='Accepted', fill=True, hue_order=(True, False))
+ax.set_xlim((-5, 15))
+ax.set_title('Answer Score Distribution')
+fig = plt.gcf()
+fig.patch.set_facecolor('white')
+fig.savefig(os.path.join(PATH_OUT, 'plots/score-densities.png'), dpi=200)
+plt.show()
+# %%
+df.describe()
 # %%
