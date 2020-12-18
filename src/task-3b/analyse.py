@@ -1,6 +1,7 @@
 import re, os
 from collections import defaultdict
 from pymongo import MongoClient
+import pymongo
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -136,3 +137,64 @@ plt.imshow(wc, interpolation='bilinear')
 plt.axis('off')
 plt.show()
 wc.to_file(os.path.join(PATH_OUT, 'plots/word-cloud.png'))
+
+
+###############  Scatter plot of proportion  ###############
+############### of upvotes given vs received ###############
+users_top = db.users.find().sort(
+    'Reputation', pymongo.DESCENDING).skip(100000).limit(10000)
+
+user_data = []
+for user in users_top:
+    try:
+        temp = {}
+        temp['UserId'] = user['Id']
+        temp['Reputation'] = user['Reputation']
+        temp['UpvotesGiven'] = user['UpVotes']
+        temp['DownvotesGiven'] = user['DownVotes']
+
+        posts = db.posts.find({'OwnerUserId': user['Id']})
+        positive = 0
+        negative = 0
+        for post in posts:
+            positive += db.votes.find(
+                {'$and': [{'PostId': post['Id']}, {'VoteTypeId': '2'}]}).count()
+            negative += db.votes.find(
+                {'$and': [{'PostId': post['Id']}, {'VoteTypeId': '3'}]}).count()
+        temp['UpvotesReceived'] = positive
+        temp['DownvotesReceived'] = negative
+    except KeyError:
+        continue
+    user_data.append(temp)
+
+for x in user_data:
+    x['UpvotesReceived'] = int(x['UpvotesReceived'])
+    x['UpvotesGiven'] = int(x['UpvotesGiven'])
+    x['DownvotesReceived'] = int(x['DownvotesReceived'])
+    x['DownvotesGiven'] = int(x['DownvotesGiven'])
+
+    if x['UpvotesReceived'] + x['DownvotesReceived'] == 0:
+        x['ReceivedRatio'] = 0
+    else:
+        x['ReceivedRatio'] = x['UpvotesReceived'] / \
+            (x['UpvotesReceived'] + x['DownvotesReceived'])
+
+    if x['UpvotesGiven'] + x['DownvotesGiven'] == 0:
+        x['GivenRatio'] = 0
+    else:
+        x['GivenRatio'] = x['UpvotesGiven'] / \
+            (x['UpvotesGiven'] + x['DownvotesGiven'])
+
+df = pd.DataFrame.from_records(user_data)
+df = df.assign(TotalReceived=lambda x: x.UpvotesReceived + x.DownvotesReceived)
+df = df.assign(TotalGiven=lambda x: x.UpvotesGiven + x.DownvotesGiven)
+filtered_df = df[df.TotalGiven > 20]
+filtered_df = df[df.TotalReceived > 20]
+ax = filtered_df.plot.scatter(x='ReceivedRatio', y='GivenRatio')
+ax.set_xlabel('Proportion of upvotes received')
+ax.set_ylabel('Proportion of upvotes given')
+ax.set_title('No Tit For Tat?')
+fig = plt.gcf()
+plt.show()
+fig.patch.set_facecolor('white')
+fig.savefig(os.path.join(PATH_OUT, 'plots/vote-ratio.png'), dpi=200)
