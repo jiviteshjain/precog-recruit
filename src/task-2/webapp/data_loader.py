@@ -123,6 +123,12 @@ def process_for_user(df):
                     'width': 1
                 }
             },
+            'xbins': {
+                'start': 0,
+                'end': 500000,
+                'size': 1000
+            },
+            'autobinx': False,
         },
         {
             'type': 'histogram',
@@ -136,6 +142,12 @@ def process_for_user(df):
                     'width': 1
                 }
             },
+            'xbins': {
+                'start': 0,
+                'end': 500000,
+                'size': 1000
+            },
+            'autobinx': False,
         },
         # {
         #     'type': 'histogram',

@@ -10,6 +10,34 @@ body {
     font-size: 1.4rem;
 }
 
+.footer {
+    background-color: #555555 !important;
+    width: 100%;
+    box-sizing: border-box;
+    height: 5em;
+}
+
+/* @media screen and (min-width: 845px) {
+    .padded {
+        padding-left: 1.4em;
+        padding-right: 1.4em;
+    }
+} */
+
+@media screen and (min-width: 992px) {
+    .padded {
+        padding-left: 6em;
+        padding-right: 6em;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .padded {
+        padding-left: 11em;
+        padding-right: 11em;
+    }
+}
+
 /* WELCOME SCREEN */
 #welcome {
     height: 100vh;
