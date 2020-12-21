@@ -1,9 +1,10 @@
-from flask import Flask
-from data_loader import load_all
+from flask import Flask, render_template
+from data_loader import get_all
 
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return 'Hello, World!'
+    data = get_all()
+    return render_template('index.html', data=data)

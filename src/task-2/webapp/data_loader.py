@@ -64,12 +64,87 @@ def process_for_user(df):
     x = corr.columns.tolist()
     y = corr.columns.tolist()
     z = corr.to_numpy().tolist()
-    return [{
+    
+    data_corr = [{
+        'colorscale': 'Greens',
         'type': 'heatmap',
         'x': x,
         'y': y,
         'z': z,
     }, ]
+
+    data_ff = [
+        {
+            'type': 'histogram',
+            'opacity': 0.8,
+            'x': user_df['user_followers_count'].tolist(),
+            'name': 'Followers',
+            'xbins': {
+                'start': 0,
+                'end': 100000,
+                'size': 100
+            },
+            'autobinx': False,
+            'marker': {
+                'color': 'rgba(174, 63, 89, 0.6)',
+                'line': {
+                    'color':  'rgba(174, 63, 89, 1)',
+                    'width': 1
+                }
+            },
+        },
+        {
+            'type': 'histogram',
+            'opacity': 0.8,
+            'x': user_df['user_friends_count'].tolist(),
+            'name': 'Friends',
+            'autobinx': True,
+            'marker': {
+                'color': 'rgba(247, 168, 124, 0.69)',
+                'line': {
+                    'color':  'rgba(247, 168, 124, 1)',
+                    'width': 1
+                }
+            },
+        },
+    ]
+
+    data_act = [
+        {
+            'type': 'histogram',
+            'opacity': 1,
+            'x': user_df['user_statuses_count'].tolist(),
+            'name': 'Tweet Activity',
+            'marker': {
+                'color': 'rgba(88, 100, 253, 0.69)',
+                'line': {
+                    'color':  'rgba(88, 100, 253, 83, 1)',
+                    'width': 1
+                }
+            },
+        },
+        {
+            'type': 'histogram',
+            'opacity': 0.5,
+            'x': user_df['user_favorites_count'].tolist(),
+            'name': 'Liked Posts',
+            'marker': {
+                'color': 'rgba(240, 83, 83, 0.69)',
+                'line': {
+                    'color':  'rgba(240, 83, 83, 1)',
+                    'width': 1
+                }
+            },
+        },
+        # {
+        #     'type': 'histogram',
+        #     'opacity': 0.6,
+        #     'x': user_df['user_listed_count'].tolist(),
+        #     'name': 'Presence on Lists',
+        #     'xaxis': 'x2',
+        # },
+    ]
+    return data_corr, data_ff, data_act
 
 #############################################
 
@@ -119,14 +194,16 @@ def process_for_places(df):
     place_df = df[df.place.notnull()][['place', 'lang']]
     centroid_df = place_df['place'].apply(get_centroid).apply(pd.Series)
     centroid_df.columns = ['longitude', 'latitude']
+    place_df['lang'] = place_df['lang'].apply(lambda x: x.upper())
     centroid_df = centroid_df.join(place_df['lang'], how='inner') # on index
     res = []
     for name, group in centroid_df.groupby('lang'):
         res.append({
-            'type': 'scattermapbox',
+            'type': 'scattergeo',
             'name': name,
             'lat': group.latitude.tolist(),
-            'lon': group.longitude.tolist()
+            'lon': group.longitude.tolist(),
+            'hoverinfo': 'name'
         })
     return res
 
@@ -135,10 +212,12 @@ def process_for_places(df):
 def get_all():
     df = load_file(FILE_PATH)
     data_lang = process_for_lang(df)
-    data_user = process_for_user(df)
+    data_corr, data_ff, data_act = process_for_user(df)
     data_places = process_for_places(df)
     return {
-        'data_lang': data_lang,
-        'data_user': data_user,
-        'data_places': data_places
+        'lang': data_lang,
+        'corr': data_corr,
+        'ff': data_ff,
+        'act': data_act,
+        'places': data_places,
     }
