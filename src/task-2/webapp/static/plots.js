@@ -119,4 +119,27 @@ function plot(data) {
         },
     };
     Plotly.newPlot("plot-5", data["act"], layout5, { responsive: true });
+    console.log(data["senti"])
+    twttr.ready(function (twttr) {
+        twttr.widgets.createTweet(
+            data["senti"]["positive"],
+            document.getElementById("tw-pos"),
+            {
+                theme: "light",
+                cards: "hidden",
+                align: "center",
+            }
+        );
+        twttr.widgets.createTweet(
+            data["senti"]["negative"],
+            document.getElementById("tw-neg"),
+            {
+                theme: "light",
+                cards: "hidden",
+                align: "center",
+            }
+        );
+    });
+
+    
 }

@@ -173,9 +173,9 @@ def calc_sentiment(text, senti):
 
 def categorise_sentiment(val):
     # based on official paper: https://github.com/cjhutto/vaderSentiment#about-the-scoring
-    if val >= 0.05:
+    if val >= 0.08:
         return 'Positive'
-    elif val > -0.05:
+    elif val > -0.08:
         return 'Neutral'
     else:
         return 'Negative'
@@ -197,6 +197,13 @@ def process_for_sentiment(df):
     scores.columns = ['negative', 'neutral', 'positive', 'compound']
     text_df = text_df.join(scores, how='left')  # on default index
     text_df['sentiment'] = text_df['compound'].apply(categorise_sentiment)
+    neg = str(int(text_df.loc[text_df.sentiment == 'Negative'].sample().id))
+    pos = str(int(text_df.loc[text_df.sentiment == 'Positive'].sample().id))
+    
+    return {
+        'negative': neg,
+        'positive': pos
+    }
 
 #############################################
 
@@ -227,10 +234,17 @@ def get_all():
     data_lang = process_for_lang(df)
     data_corr, data_ff, data_act = process_for_user(df)
     data_places = process_for_places(df)
+    data_senti = process_for_sentiment(df)
     return {
         'lang': data_lang,
         'corr': data_corr,
         'ff': data_ff,
         'act': data_act,
         'places': data_places,
+        'senti': data_senti,
     }
+
+# %%
+df = load_file(FILE_PATH)
+process_for_sentiment(df)
+# %%
