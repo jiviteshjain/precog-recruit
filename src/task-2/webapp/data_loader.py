@@ -173,9 +173,9 @@ def calc_sentiment(text, senti):
 
 def categorise_sentiment(val):
     # based on official paper: https://github.com/cjhutto/vaderSentiment#about-the-scoring
-    if val >= 0.08:
+    if val >= 0.1:
         return 'Positive'
-    elif val > -0.08:
+    elif val > -0.1:
         return 'Neutral'
     else:
         return 'Negative'
@@ -243,8 +243,3 @@ def get_all():
         'places': data_places,
         'senti': data_senti,
     }
-
-# %%
-df = load_file(FILE_PATH)
-process_for_sentiment(df)
-# %%
