@@ -1,3 +1,47 @@
+window.onload = function () {
+    navbar = document.getElementById("navbarstick");
+    getNavbarOffset();
+};
+window.onresize = function () {
+    getNavbarOffset();
+    stickyNavbar();
+};
+
+window.onscroll = stickyNavbar;
+
+// SCROLL-DOWN BUTTON: WELCOME SCREEN: INDEX.HTML
+
+$(function () {
+    $(".scroll-down").click(function () {
+        $("html, body").animate({ scrollTop: $(".nav").offset().top }, "slow");
+        return false;
+    });
+});
+
+// STICKY NAVBAR
+
+var navbar;
+var navbarVisibleScroll;
+
+function getNavbarOffset() {
+    // if ($("body").hasClass("home")) {
+        navbarVisibleScroll = document.getElementById("welcome").clientHeight;
+    // }
+}
+
+function stickyNavbar() {
+    // if ($("body").hasClass("home")) {
+        if (window.scrollY >= navbarVisibleScroll) {
+            navbar.classList.add("sticky");
+        } else {
+            navbar.classList.remove("sticky");
+        }
+    // }
+}
+
+
+// PLOTS
+
 function plot(data) {
     let layout1 = {
         margin: {
@@ -12,7 +56,8 @@ function plot(data) {
     let layout2 = {
         margin: {
             l: 125,
-            b: 80,
+            b: 85,
+            t: 15,
         },
     };
     Plotly.newPlot("plot-2", data["corr"], layout2, { responsive: true });
@@ -20,10 +65,6 @@ function plot(data) {
     let layout3 = {
         dragmode: "zoom",
         geo: {
-            // showrivers: true,
-            // rivercolor: '#fff',
-            // showlakes: true,
-            // lakecolor: '#fff',
             showland: true,
             landcolor: "#e2daed",
             countrycolor: "#d3d3d3",
@@ -41,9 +82,7 @@ function plot(data) {
             l: 15,
             r: 0,
         },
-        // showlegend: false,
         legend: {
-            // orientation: "h",
             title: "Languages",
         },
     };
@@ -59,6 +98,9 @@ function plot(data) {
             title: "Count",
         },
         bargap: 0.05,
+        margin: {
+            t: 0
+        }
     };
     Plotly.newPlot("plot-4", data["ff"], layout4, {responsive: true});
 
@@ -72,14 +114,9 @@ function plot(data) {
             title: "Count",
         },
         bargap: 0.05,
-        // xaxis2: {
-        //     title: "xaxis2 title",
-        //     titlefont: { color: "rgb(148, 103, 189)" },
-        //     tickfont: { color: "rgb(148, 103, 189)" },
-        //     overlaying: "x",
-        //     side: "top",
-        //     range: [0, 5]
-        // },
+        margin: {
+            t: 0,
+        },
     };
     Plotly.newPlot("plot-5", data["act"], layout5, { responsive: true });
 }

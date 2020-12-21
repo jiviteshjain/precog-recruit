@@ -25,7 +25,8 @@ def process_for_lang(df):
     lang_counts = df.groupby('lang')['id'].count().to_frame().reset_index()
     lang_counts.columns = ['lang', 'count']
     lang_counts.sort_values(by='count', inplace=True, ascending=False)
-    lang_counts = lang_counts[:10]
+    lang_counts.iloc[10:, :].loc[:, 'lang'] = 'other'
+
     values = lang_counts['count'].tolist()
     labels = lang_counts['lang'].tolist()
     return [{

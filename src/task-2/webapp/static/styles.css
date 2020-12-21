@@ -1,83 +1,357 @@
-.header h1 {
-    font-family: 'Playfair Display', serif;
-    font-weight: 900;
-    font-size: 6rem;
-}
 
-.header {
-    position: sticky;
-}
 
 body {
     font-family: 'Lato', sans-serif;
 }
 
-.gradient-text {
-    /* Fallback: Set a background color. */
-    background-color: #CA4246;
-
-    /* Create the gradient. */
-    background-image: linear-gradient(45deg,
-            #CA4246 16.666%,
-            #E16541 16.666%,
-            #E16541 33.333%,
-            #F18F43 33.333%,
-            #F18F43 50%,
-            #8B9862 50%,
-            #8B9862 66.666%,
-            #476098 66.666%,
-            #476098 83.333%,
-            #A7489B 83.333%);
-
-    /* Set the background size and repeat properties. */
-    background-size: 100%;
-    background-repeat: repeat;
-
-    /* Use the text as a mask for the background. */
-    /* This will show the gradient as a text color rather than element bg. */
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-
-    /* Animate the text when loading the element. */
-    /* This animates it on page load and when hovering out. */
-    animation: rainbow-text-simple-animation-rev 0.75s ease forwards;
-
+.card-header {
+    font-weight: 300;
+    text-transform: uppercase;
+    font-size: 1.4rem;
 }
 
-.gradient-text:hover {
-    animation: rainbow-text-simple-animation 0.5s ease-in forwards;
+/* WELCOME SCREEN */
+#welcome {
+    height: 100vh;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2)),
+    url("marble.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
 }
 
+@media screen and (max-width: 810px) {
+    #welcome {
+        background-image: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.6)),
+        url("marble.jpg");
+    }
+}
 
-/* Move the background and make it smaller. */
-/* Animation shown when entering the page and after the hover animation. */
-@keyframes rainbow-text-simple-animation-rev {
-    0% {
-        background-size: 650%;
+#me {
+    display: inline-block;
+    color: white;
+    text-align: left;
+    font-family: 'Pacifico', cursive;
+    font-size: 800%;
+    padding-left: 5%;
+    padding-top: 0.1%;
+    margin-top: 0;
+    line-height: 98%;
+    vertical-align: bottom;
+
+    /* -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: fadein 3s;
+    /*Firefox < 16*/
+    -ms-animation: fadein 3s;
+    /*Internet Explorer*/
+    -o-animation: fadein 3s;
+    /*Opera < 12.1*/
+    animation: fadein 3s;
+
+    -moz-animation-fill-mode: backwards;
+    -ms-animation-fill-mode: backwards;
+    -o-animation-fill-mode: backwards;
+    animation-fill-mode: backwards;
+}
+
+#name {
+    display: inline-block;
+    color: rgb(255, 255, 255);
+    text-align: left;
+    font-family: 'Raleway', sans-serif;
+    font-size: 200%;
+    padding-left: 5%;
+    padding-top: 10%;
+    margin-bottom: 2%;
+    padding-bottom: 0;
+    margin-top: 7%;
+    letter-spacing: 5px;
+
+    /* -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: fadein 3s ease 3s 1 normal;
+    /*Firefox < 16*/
+    -ms-animation: fadein 3s ease 3s 1 normal;
+    /*Internet Explorer*/
+    -o-animation: fadein 3s ease 3s 1 normal;
+    /*Opera < 12.1*/
+    animation: fadein 3s ease 3s 1 normal;
+
+    -moz-animation-fill-mode: backwards;
+    -ms-animation-fill-mode: backwards;
+    -o-animation-fill-mode: backwards;
+    animation-fill-mode: backwards;
+}
+
+#desc {
+    display: inline-block;
+    color: #4fb3bf;
+    text-align: left;
+    font-family: 'Raleway', sans-serif;
+    font-size: 210%;
+    padding-left: 5%;
+    margin-top: 0;
+    padding-top: 1.5%;
+
+    /* -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: fadein 3s ease 1.5s 1 normal;
+    /*Firefox < 16*/
+    -ms-animation: fadein 3s ease 1.5s 1 normal;
+    /*Internet Explorer*/
+    -o-animation: fadein 3s ease 1.5s 1 normal;
+    /*Opera < 12.1*/
+    animation: fadein 3s ease 1.5s 1 normal;
+
+    -moz-animation-fill-mode: backwards;
+    -ms-animation-fill-mode: backwards;
+    -o-animation-fill-mode: backwards;
+    animation-fill-mode: backwards;
+}
+
+#at {
+    color: #4fb3bf;
+    font-weight: bold;
+}
+
+#jain {
+    font-weight: bold;
+    font-size: 95%
+}
+
+@media screen and (max-width: 810px) {
+    #name {
+        font-size: 150%;
+        letter-spacing: 3px;
+    }
+
+    #me {
+        font-size: 500%;
+        padding-top: 3%;
+        padding-bottom: 3%;
+    }
+
+    #desc {
+        font-size: 175%
+    }
+}
+
+@media screen and (max-height: 600px) {
+    #name {
+        margin-top: 1.25%;
+    }
+}
+
+@media screen and (max-height: 500px) {
+    #welcome {
+        display: none;
+    }
+}
+
+/*SCROLLDOWN BUTTON*/
+.scroll-down {
+    opacity: 1;
+    -webkit-transition: all .5s ease-in 3s;
+    transition: all .5s ease-in 3s;
+}
+
+.scroll-down {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    margin-left: -16px;
+    display: block;
+    width: 32px;
+    height: 32px;
+    border: 4px solid #4fb3bf;
+    background-size: 14px auto;
+    border-radius: 50%;
+    z-index: 2;
+    -webkit-animation: bounce 2s infinite 2s, fadein 3s 1 3s;
+    animation: bounce 2s infinite 2s, fadein 3s 1 3s;
+    -webkit-animation-fill-mode: backwards;
+    animation-fill-mode: backwards;
+    -webkit-transition: all .2s ease-in;
+    transition: all .2s ease-in;
+}
+
+.scroll-down:before {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: calc(50% - 8px);
+    left: calc(50% - 6px);
+    transform: rotate(-45deg);
+    display: block;
+    width: 12px;
+    height: 12px;
+    content: "";
+    border: 4px solid #4fb3bf;
+    border-width: 0px 0 4px 4px;
+}
+
+/*FADEIN ANIMATIONS*/
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/*BOUNCE ANIMATIONS*/
+@keyframes bounce {
+
+    0%,
+    100%,
+    20%,
+    50%,
+    80% {
+        -webkit-transform: translateY(0);
+        -ms-transform: translateY(0);
+        transform: translateY(0);
     }
 
     40% {
-        background-size: 650%;
+        -webkit-transform: translateY(-10px);
+        -ms-transform: translateY(-10px);
+        transform: translateY(-10px);
     }
 
-    100% {
-        background-size: 100%;
+    60% {
+        -webkit-transform: translateY(-5px);
+        -ms-transform: translateY(-5px);
+        transform: translateY(-5px);
     }
 }
 
-/* Move the background and make it larger. */
-/* Animation shown when hovering over the text. */
-@keyframes rainbow-text-simple-animation {
-    0% {
-        background-size: 100%;
+/* Navbar */
+.nav {
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    margin-bottom: 50px;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    height: 70px;
+}
+
+.navlink {
+    flex-basis: 175px;
+    margin: 9px 10px;
+    padding: 13px 0px;
+    background-color: white;
+    color: #00838f;
+    line-height: 90%;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: none;
+    border-style: solid;
+    border-color: #00838f;
+    border-radius: 10px;
+    border-width: 4px;
+
+    -webkit-transition: background-color 0.2s;
+    -moz-transition: background-color 0.2s;
+    -ms-transition: background-color 0.2s;
+    -o-transition: background-color 0.2s;
+    transition: background-color 0.2s;
+}
+
+#navtext {
+    font-family: 'Raleway', sans-serif;
+    font-size: 175%;
+    letter-spacing: 2px;
+    border-style: none;
+    margin-left: 6%;
+    margin-right: auto;
+    flex-basis: auto;
+    font-weight: normal;
+    color: black;
+}
+
+
+#navat {
+    font-weight: bold;
+    color: #4fb3bf;
+}
+
+#navjain {
+    font-weight: bold;
+}
+
+@media screen and (max-width: 810px) {
+    .nav {
+        flex-direction: column;
+        height: auto;
+        justify-content: center;
     }
 
-    80% {
-        background-size: 650%;
+    .navlink {
+        border-style: none;
+        width: 100%;
+        border-radius: 0px;
+        flex-basis: auto;
+        margin-left: 0;
+        margin-right: 0;
     }
 
-    100% {
-        background-size: 650%;
+    #navtext {
+        margin-left: 0;
     }
+}
+
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 2;
+    box-shadow: 0 0.5px 20px 1px rgba(37, 37, 37, 0.459);
+}
+
+.sticky+.textsection {
+    padding-top: 125px !important;
+}
+
+/* SHADOW */
+.shadow {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
+        0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.shadow-move {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12), 0 4px 5px rgba(0, 0, 0, 0.24);
+    transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+}
+
+.shadow-move:hover {
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
