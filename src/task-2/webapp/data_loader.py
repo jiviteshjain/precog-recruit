@@ -9,7 +9,7 @@ import pandas as pd
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-FILE_PATH = 'data/main_tweets_utf.json'
+FILE_PATH = 'corpus/main_tweets_utf.json'
 TWITTER_HANDLE_REGEX = '@\\w{1,15}'
 URL_REGEX = 'https?://[A-Za-z0-9./]*'
 
