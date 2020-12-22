@@ -3,7 +3,7 @@
 
 ## Outputs
 
-Link to Outputs: [Onedrive](https://iiitaphyd-my.sharepoint.com/:f:/g/personal/jivitesh_jain_students_iiit_ac_in/ElW2V3WHch1GuOtrBuTUwP0BRork_VcIH8v4veN6k9pyoQ?e=addp0A)
+Link to Outputs (Including plots): [Onedrive](https://iiitaphyd-my.sharepoint.com/:f:/g/personal/jivitesh_jain_students_iiit_ac_in/ElW2V3WHch1GuOtrBuTUwP0BRork_VcIH8v4veN6k9pyoQ?e=addp0A)
 
 Link to interactive visualisations (Task-2): [Heroku](https://twisualise.herokuapp.com)
 
