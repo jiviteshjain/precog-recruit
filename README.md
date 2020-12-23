@@ -75,9 +75,27 @@ The application is written in Flask, and can also be run locally using the offic
 
 ### Task-3a Script
 
-The script `run.py` parses an individual PDF, given its path. Options can be seen using `-h` option. While options `-f` and `-d` are compulsory (file and database name), others are optional. Parameters can be tuned using the `--conf` options, while the script makes a best effort itself, and gives appropriate warnings when it can't.
+**To directly run on the 4 given PDFS:**  
+In folder `src/task-3a`, run:
+```python3 run.py -f path/to/folder/containing/pdfs```
+and it will process those 4 (or any other) pdfs in the given directory with parameters tuned for the given PDFs.
 
-The script `main.py` will parse the given 4 PDFs using tuned hyperparameters and store in `jivitesh-task-3a` database. The tables are stored column first to account for missing column headers etc while parsing.
+(Optionally, you can also specify `-d database-name` (defaults to `jivitesh-task-3a`), `--host MongoDB-host` and `--port MongoDB-port`. `-h` prints help.)
+
+**Details: (Not needed for the given 4 PDFs)**  
+If you want to run the code on a single PDF file, in folder `src/task-3a`, run:
+```python3 main.py -f path/to/file -d database_name```
+
+(Optional arguments: `--host MongoDB-host`, `--port MongoDB-port`, `--method auto|lattice|stream`, `--conf key val`. `-h` prints help.)
+
+*Parser Tuning:*  
+Because PDF was not designed to hold structured information, the parsers being used benefit from parameters specifically given for the given PDF. Although the script makes an attempt to try some combinations, it can result in false positives (the program has no way to verify if an extracted table is an actual table), and hence parameter tuning and visual debugging may be required.  
+
+The last two options are used to tune the parser. Lattice method is better for tables with borders, and stream is better for tables without borders. The script, by default, (in `auto` mode) will use `lattice` first and switch to `stream` if no tables are detected. The `--conf` options can be seen in the [official documentation](https://camelot-py.readthedocs.io/en/master/user/advanced.html) and set as multiple key-value pairs, for example `python3 main.py -f file.pdf --method stream --conf row_tol 10 --conf edge_tol 100` (more complicated ones that require lists/dictionaries/non-primitive-datatypes to be passed can be specified at the top of the main.py file in `parse_config`). The script tries to log accuracy and throw warnings if the results are poor.
+
+*Storage Format:*  
+Because column headers can be missing (or identical for multiple columns) due to parsing errors, the tables are **not** stored as collections with each row as a document and column headers as keys.
+Instead, each individual table is stored as a single document with column indices as keys. This ensures that keys are never ambiguous or missing. The scripts also contain functions (`main.py:tables_from_mongo`) for retrieving the stored tables from MongoDB and converting them back into dataframes. All tables of the same PDF are stored in a collection sharing its name with the PDF.
 
 ### Task-3b Script and Report
 
